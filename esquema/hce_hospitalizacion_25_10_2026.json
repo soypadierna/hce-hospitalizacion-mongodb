@@ -1,0 +1,644 @@
+{
+  "collections": {
+    "hce_hospitalizacion.diagnosticos_cie10": {
+      "ns": "hce_hospitalizacion.diagnosticos_cie10",
+      "jsonSchema": {
+        "bsonType": "object",
+        "required": [
+          "_id",
+          "capitulo",
+          "descripcion"
+        ],
+        "properties": {
+          "_id": {
+            "bsonType": "string"
+          },
+          "capitulo": {
+            "bsonType": "string"
+          },
+          "descripcion": {
+            "bsonType": "string"
+          }
+        }
+      }
+    },
+    "hce_hospitalizacion.evoluciones": {
+      "ns": "hce_hospitalizacion.evoluciones",
+      "jsonSchema": {
+        "bsonType": "object",
+        "required": [
+          "_id",
+          "analisis",
+          "fecha",
+          "hospitalizacion_id",
+          "objetivo",
+          "plan",
+          "profesional_id",
+          "subjetivo"
+        ],
+        "properties": {
+          "_id": {
+            "bsonType": "objectId"
+          },
+          "analisis": {
+            "bsonType": "string"
+          },
+          "fecha": {
+            "bsonType": "date"
+          },
+          "hospitalizacion_id": {
+            "bsonType": "objectId"
+          },
+          "objetivo": {
+            "bsonType": "string"
+          },
+          "plan": {
+            "bsonType": "string"
+          },
+          "profesional_id": {
+            "bsonType": "objectId"
+          },
+          "subjetivo": {
+            "bsonType": "string"
+          }
+        }
+      }
+    },
+    "hce_hospitalizacion.hospitalizaciones": {
+      "ns": "hce_hospitalizacion.hospitalizaciones",
+      "jsonSchema": {
+        "bsonType": "object",
+        "required": [
+          "_id",
+          "admision",
+          "diagnosticos",
+          "estado",
+          "numero_ingreso",
+          "paciente_id",
+          "tratamientos"
+        ],
+        "properties": {
+          "_id": {
+            "bsonType": "objectId"
+          },
+          "admision": {
+            "bsonType": "object",
+            "properties": {
+              "cama": {
+                "bsonType": "string"
+              },
+              "fecha": {
+                "bsonType": "date"
+              },
+              "motivo_consulta": {
+                "bsonType": "string"
+              },
+              "profesional_id": {
+                "bsonType": "objectId"
+              },
+              "servicio": {
+                "bsonType": "string"
+              },
+              "via_ingreso": {
+                "bsonType": "string"
+              }
+            },
+            "required": [
+              "cama",
+              "fecha",
+              "motivo_consulta",
+              "profesional_id",
+              "servicio",
+              "via_ingreso"
+            ]
+          },
+          "alta": {
+            "bsonType": "object",
+            "properties": {
+              "diagnostico_egreso": {
+                "bsonType": "string"
+              },
+              "fecha": {
+                "bsonType": "date"
+              },
+              "indicaciones": {
+                "bsonType": "string"
+              },
+              "profesional_id": {
+                "bsonType": "objectId"
+              },
+              "tipo": {
+                "bsonType": "string"
+              }
+            },
+            "required": [
+              "diagnostico_egreso",
+              "fecha",
+              "indicaciones",
+              "profesional_id",
+              "tipo"
+            ]
+          },
+          "diagnosticos": {
+            "bsonType": "array",
+            "items": {
+              "bsonType": "object",
+              "properties": {
+                "cie10_codigo": {
+                  "bsonType": "string"
+                },
+                "fecha": {
+                  "bsonType": "date"
+                },
+                "tipo": {
+                  "bsonType": "string"
+                }
+              },
+              "required": [
+                "cie10_codigo",
+                "fecha",
+                "tipo"
+              ]
+            }
+          },
+          "estado": {
+            "bsonType": "string"
+          },
+          "numero_ingreso": {
+            "bsonType": "string"
+          },
+          "paciente_id": {
+            "bsonType": "objectId"
+          },
+          "tratamientos": {
+            "bsonType": "array",
+            "items": {
+              "bsonType": "object",
+              "properties": {
+                "dosis": {
+                  "bsonType": "string"
+                },
+                "fecha_fin": {
+                  "bsonType": "date"
+                },
+                "fecha_inicio": {
+                  "bsonType": "date"
+                },
+                "frecuencia": {
+                  "bsonType": "string"
+                },
+                "medicamento_id": {
+                  "bsonType": "objectId"
+                },
+                "prescribe_id": {
+                  "bsonType": "objectId"
+                },
+                "via": {
+                  "bsonType": "string"
+                }
+              },
+              "required": [
+                "dosis",
+                "fecha_inicio",
+                "frecuencia",
+                "medicamento_id",
+                "prescribe_id",
+                "via"
+              ]
+            }
+          }
+        }
+      }
+    },
+    "hce_hospitalizacion.medicamentos": {
+      "ns": "hce_hospitalizacion.medicamentos",
+      "jsonSchema": {
+        "bsonType": "object",
+        "required": [
+          "_id",
+          "activo",
+          "codigo",
+          "concentracion",
+          "forma",
+          "nombre_generico"
+        ],
+        "properties": {
+          "_id": {
+            "bsonType": "objectId"
+          },
+          "activo": {
+            "bsonType": "bool"
+          },
+          "codigo": {
+            "bsonType": "string"
+          },
+          "concentracion": {
+            "bsonType": "string"
+          },
+          "forma": {
+            "bsonType": "string"
+          },
+          "nombre_generico": {
+            "bsonType": "string"
+          }
+        }
+      }
+    },
+    "hce_hospitalizacion.notas_enfermeria": {
+      "ns": "hce_hospitalizacion.notas_enfermeria",
+      "jsonSchema": {
+        "bsonType": "object",
+        "required": [
+          "_id",
+          "fecha",
+          "hospitalizacion_id",
+          "nota",
+          "profesional_id",
+          "turno"
+        ],
+        "properties": {
+          "_id": {
+            "bsonType": "objectId"
+          },
+          "fecha": {
+            "bsonType": "date"
+          },
+          "hospitalizacion_id": {
+            "bsonType": "objectId"
+          },
+          "nota": {
+            "bsonType": "string"
+          },
+          "profesional_id": {
+            "bsonType": "objectId"
+          },
+          "turno": {
+            "bsonType": "string"
+          }
+        }
+      }
+    },
+    "hce_hospitalizacion.pacientes": {
+      "ns": "hce_hospitalizacion.pacientes",
+      "jsonSchema": {
+        "bsonType": "object",
+        "required": [
+          "_id",
+          "apellidos",
+          "direccion",
+          "eps",
+          "fecha_nacimiento",
+          "nombres",
+          "numero_documento",
+          "sexo",
+          "telefono",
+          "tipo_documento"
+        ],
+        "properties": {
+          "_id": {
+            "bsonType": "objectId"
+          },
+          "apellidos": {
+            "bsonType": "string"
+          },
+          "direccion": {
+            "bsonType": "string"
+          },
+          "eps": {
+            "bsonType": "string"
+          },
+          "fecha_nacimiento": {
+            "bsonType": "date"
+          },
+          "nombres": {
+            "bsonType": "string"
+          },
+          "numero_documento": {
+            "bsonType": "string"
+          },
+          "sexo": {
+            "bsonType": "string"
+          },
+          "telefono": {
+            "bsonType": "string"
+          },
+          "tipo_documento": {
+            "bsonType": "string"
+          }
+        }
+      }
+    },
+    "hce_hospitalizacion.profesionales": {
+      "ns": "hce_hospitalizacion.profesionales",
+      "jsonSchema": {
+        "bsonType": "object",
+        "required": [
+          "_id",
+          "apellidos",
+          "nombres",
+          "registro_medico",
+          "rol"
+        ],
+        "properties": {
+          "_id": {
+            "bsonType": "objectId"
+          },
+          "apellidos": {
+            "bsonType": "string"
+          },
+          "especialidad": {
+            "bsonType": "string"
+          },
+          "nombres": {
+            "bsonType": "string"
+          },
+          "registro_medico": {
+            "bsonType": "string"
+          },
+          "rol": {
+            "bsonType": "string"
+          }
+        }
+      }
+    },
+    "hce_hospitalizacion.signos_vitales": {
+      "ns": "hce_hospitalizacion.signos_vitales",
+      "jsonSchema": {
+        "bsonType": "object",
+        "required": [
+          "_id",
+          "fc",
+          "fecha",
+          "fr",
+          "hospitalizacion_id",
+          "profesional_id",
+          "sat_o2",
+          "ta_dia",
+          "ta_sis",
+          "temp"
+        ],
+        "properties": {
+          "_id": {
+            "bsonType": "objectId"
+          },
+          "fc": {
+            "bsonType": "int"
+          },
+          "fecha": {
+            "bsonType": "date"
+          },
+          "fr": {
+            "bsonType": "int"
+          },
+          "hospitalizacion_id": {
+            "bsonType": "objectId"
+          },
+          "profesional_id": {
+            "bsonType": "objectId"
+          },
+          "sat_o2": {
+            "bsonType": "int"
+          },
+          "ta_dia": {
+            "bsonType": "int"
+          },
+          "ta_sis": {
+            "bsonType": "int"
+          },
+          "temp": {
+            "bsonType": [
+              "double",
+              "int"
+            ]
+          }
+        }
+      }
+    }
+  },
+  "relationships": [
+    {
+      "id": "e0974a8c-5b9c-4560-b4e5-117de093575b",
+      "relationship": [
+        {
+          "ns": "hce_hospitalizacion.evoluciones",
+          "fields": [
+            "hospitalizacion_id"
+          ],
+          "cardinality": 1
+        },
+        {
+          "ns": "hce_hospitalizacion.hospitalizaciones",
+          "fields": [
+            "_id"
+          ],
+          "cardinality": 1
+        }
+      ],
+      "isInferred": true
+    },
+    {
+      "id": "93ea3f80-0756-4995-85b6-8f79036bdf03",
+      "relationship": [
+        {
+          "ns": "hce_hospitalizacion.notas_enfermeria",
+          "fields": [
+            "hospitalizacion_id"
+          ],
+          "cardinality": 1
+        },
+        {
+          "ns": "hce_hospitalizacion.hospitalizaciones",
+          "fields": [
+            "_id"
+          ],
+          "cardinality": 1
+        }
+      ],
+      "isInferred": true
+    },
+    {
+      "id": "eb655756-49d5-451b-9cf8-c79e399e6015",
+      "relationship": [
+        {
+          "ns": "hce_hospitalizacion.signos_vitales",
+          "fields": [
+            "hospitalizacion_id"
+          ],
+          "cardinality": 1
+        },
+        {
+          "ns": "hce_hospitalizacion.hospitalizaciones",
+          "fields": [
+            "_id"
+          ],
+          "cardinality": 1
+        }
+      ],
+      "isInferred": true
+    },
+    {
+      "id": "44c27f45-b905-4283-8ea0-bbe015cbbc11",
+      "relationship": [
+        {
+          "ns": "hce_hospitalizacion.hospitalizaciones",
+          "fields": [
+            "tratamientos",
+            "medicamento_id"
+          ],
+          "cardinality": 1
+        },
+        {
+          "ns": "hce_hospitalizacion.medicamentos",
+          "fields": [
+            "_id"
+          ],
+          "cardinality": 1
+        }
+      ],
+      "isInferred": true
+    },
+    {
+      "id": "362fd4c0-7201-43b1-9c32-cff01dd534e7",
+      "relationship": [
+        {
+          "ns": "hce_hospitalizacion.hospitalizaciones",
+          "fields": [
+            "paciente_id"
+          ],
+          "cardinality": 1
+        },
+        {
+          "ns": "hce_hospitalizacion.pacientes",
+          "fields": [
+            "_id"
+          ],
+          "cardinality": 1
+        }
+      ],
+      "isInferred": true
+    },
+    {
+      "id": "cd56cde6-a80b-48f0-b32a-083f09f82c3a",
+      "relationship": [
+        {
+          "ns": "hce_hospitalizacion.evoluciones",
+          "fields": [
+            "profesional_id"
+          ],
+          "cardinality": 1
+        },
+        {
+          "ns": "hce_hospitalizacion.profesionales",
+          "fields": [
+            "_id"
+          ],
+          "cardinality": 1
+        }
+      ],
+      "isInferred": true
+    },
+    {
+      "id": "c89bd5dc-7214-48bf-8a07-3f50870ef7f6",
+      "relationship": [
+        {
+          "ns": "hce_hospitalizacion.hospitalizaciones",
+          "fields": [
+            "admision",
+            "profesional_id"
+          ],
+          "cardinality": 1
+        },
+        {
+          "ns": "hce_hospitalizacion.profesionales",
+          "fields": [
+            "_id"
+          ],
+          "cardinality": 1
+        }
+      ],
+      "isInferred": true
+    },
+    {
+      "id": "fca91b19-fae3-466e-b458-1de89a9e796e",
+      "relationship": [
+        {
+          "ns": "hce_hospitalizacion.hospitalizaciones",
+          "fields": [
+            "alta",
+            "profesional_id"
+          ],
+          "cardinality": 1
+        },
+        {
+          "ns": "hce_hospitalizacion.profesionales",
+          "fields": [
+            "_id"
+          ],
+          "cardinality": 1
+        }
+      ],
+      "isInferred": true
+    },
+    {
+      "id": "3b07dbe3-078e-47f3-90cd-0adfeaf7af16",
+      "relationship": [
+        {
+          "ns": "hce_hospitalizacion.hospitalizaciones",
+          "fields": [
+            "tratamientos",
+            "prescribe_id"
+          ],
+          "cardinality": 1
+        },
+        {
+          "ns": "hce_hospitalizacion.profesionales",
+          "fields": [
+            "_id"
+          ],
+          "cardinality": 1
+        }
+      ],
+      "isInferred": true
+    },
+    {
+      "id": "91bea30c-ceaa-465e-bada-3575aa3652f1",
+      "relationship": [
+        {
+          "ns": "hce_hospitalizacion.notas_enfermeria",
+          "fields": [
+            "profesional_id"
+          ],
+          "cardinality": 1
+        },
+        {
+          "ns": "hce_hospitalizacion.profesionales",
+          "fields": [
+            "_id"
+          ],
+          "cardinality": 1
+        }
+      ],
+      "isInferred": true
+    },
+    {
+      "id": "8ed1be44-0039-4c6c-a674-c90bb344bba3",
+      "relationship": [
+        {
+          "ns": "hce_hospitalizacion.signos_vitales",
+          "fields": [
+            "profesional_id"
+          ],
+          "cardinality": 1
+        },
+        {
+          "ns": "hce_hospitalizacion.profesionales",
+          "fields": [
+            "_id"
+          ],
+          "cardinality": 1
+        }
+      ],
+      "isInferred": true
+    }
+  ]
+}
