@@ -4,7 +4,7 @@
   const F = s => ISODate(s + ":00Z");
   const oid = { bsonType: "objectId" }, str = { bsonType: "string" }, dt = { bsonType: "date" }, num = { bsonType: "number" };
   // Borrado previo de colecciones para poder re-ejecutar
-  ["signos_vitales", "notas_enfermeria", "evoluciones", "hospitalizaciones", "medicamentos", "profesionales", "diagnosticos_cie10", "pacientes"].forEach(c => db.getCollection(c).drop());
+  ["signos_vitales", "notas_enfermeria", "evoluciones", "hospitalizaciones", "camas", "medicamentos", "profesionales", "diagnosticos_cie10", "pacientes"].forEach(c => db.getCollection(c).drop());
   // Colecciones con validadores $jsonSchema e índices
   db.createCollection("pacientes", { validator: { $jsonSchema: {
     bsonType: "object",
@@ -28,6 +28,11 @@
     bsonType: "object", required: ["_id", "descripcion"],
     properties: { _id: str, descripcion: str, capitulo: str } } } });
   db.diagnosticos_cie10.createIndex({ descripcion: "text" });
+  // Catálogo de camas: el _id es el código de cama y admision.cama lo referencia
+  db.createCollection("camas", { validator: { $jsonSchema: {
+    bsonType: "object", required: ["_id", "servicio", "estado"],
+    properties: { _id: str, servicio: str, estado: { enum: ["libre", "ocupada", "mantenimiento"] } } } } });
+  db.camas.createIndex({ servicio: 1, estado: 1 });
   db.createCollection("hospitalizaciones", { validator: { $jsonSchema: {
     bsonType: "object", required: ["paciente_id", "numero_ingreso", "estado", "admision", "diagnosticos"],
     properties: {
@@ -74,6 +79,13 @@
     { _id: "A09", descripcion: "Diarrea y gastroenteritis de presunto origen infeccioso", capitulo: "I" },
     { _id: "K35.8", descripcion: "Apendicitis aguda, otra y la no especificada", capitulo: "XI" },
     { _id: "I21.9", descripcion: "Infarto agudo del miocardio, sin otra especificación", capitulo: "IX" }]);
+  db.camas.insertMany([
+    { _id: "M-07", servicio: "Medicina interna", estado: "libre" }, { _id: "M-09", servicio: "Medicina interna", estado: "libre" },
+    { _id: "M-10", servicio: "Medicina interna", estado: "libre" }, { _id: "M-12", servicio: "Medicina interna", estado: "libre" },
+    { _id: "M-14", servicio: "Medicina interna", estado: "libre" }, { _id: "M-20", servicio: "Medicina interna", estado: "libre" },
+    { _id: "M-22", servicio: "Medicina interna", estado: "libre" },
+    { _id: "C-05", servicio: "Cardiología", estado: "ocupada" }, { _id: "C-06", servicio: "Cardiología", estado: "libre" },
+    { _id: "N-03", servicio: "Neumología", estado: "libre" }, { _id: "N-04", servicio: "Neumología", estado: "libre" }]);
   db.profesionales.insertMany([
     { _id: pr[0], registro_medico: "RM-0001", nombres: "Laura", apellidos: "Restrepo Vélez", rol: "medico", especialidad: "Medicina interna" },
     { _id: pr[1], registro_medico: "RM-0002", nombres: "Andrés", apellidos: "Villegas Toro", rol: "especialista", especialidad: "Cardiología" },
@@ -221,22 +233,26 @@
     ["2026-10-18T15:00", pr[5], "tarde", "Inicia dieta para diabético, tolera completa."]]);
   // Verificación de integridad referencial y de estado
   const hex = x => x.toHexString();
-  const chk = { "Hospitalizaciones con paciente_id inexistente": [], "Tratamientos con medicamento_id inexistente": [], "Diagnósticos con cie10_codigo ausente del catálogo": [], "Registros hijos con hospitalizacion_id huérfano": [], "Estado inconsistente con objeto alta": [] };
-  const kP = "Hospitalizaciones con paciente_id inexistente", kM = "Tratamientos con medicamento_id inexistente", kD = "Diagnósticos con cie10_codigo ausente del catálogo", kH = "Registros hijos con hospitalizacion_id huérfano", kE = "Estado inconsistente con objeto alta";
+  const chk = { "Hospitalizaciones con paciente_id inexistente": [], "Tratamientos con medicamento_id inexistente": [], "Diagnósticos con cie10_codigo ausente del catálogo": [], "Registros hijos con hospitalizacion_id huérfano": [], "Estado inconsistente con objeto alta": [], "Camas inexistentes o activas sin cama ocupada": [] };
+  const kP = "Hospitalizaciones con paciente_id inexistente", kM = "Tratamientos con medicamento_id inexistente", kD = "Diagnósticos con cie10_codigo ausente del catálogo", kH = "Registros hijos con hospitalizacion_id huérfano", kE = "Estado inconsistente con objeto alta", kC = "Camas inexistentes o activas sin cama ocupada";
   const idsPac = new Set(db.pacientes.distinct("_id").map(hex));
   const idsMed = new Set(db.medicamentos.distinct("_id").map(hex));
   const idsHos = new Set(db.hospitalizaciones.distinct("_id").map(hex));
   const codigos = new Set(db.diagnosticos_cie10.distinct("_id"));
+  const camasEstado = {};
+  db.camas.find().forEach(c => { camasEstado[c._id] = c.estado; });
   db.hospitalizaciones.find().forEach(h => {
     if (!idsPac.has(hex(h.paciente_id))) chk[kP].push(h.numero_ingreso);
     (h.tratamientos || []).forEach(t => { if (!idsMed.has(hex(t.medicamento_id))) chk[kM].push(h.numero_ingreso + " -> " + hex(t.medicamento_id)); });
     (h.diagnosticos || []).forEach(d => { if (!codigos.has(d.cie10_codigo)) chk[kD].push(h.numero_ingreso + " -> " + d.cie10_codigo); });
     if (h.estado === "activa" && h.alta) chk[kE].push(h.numero_ingreso + ": activa con alta");
     if (h.estado === "alta" && !h.alta) chk[kE].push(h.numero_ingreso + ": alta sin objeto alta");
+    if (!(h.admision.cama in camasEstado)) chk[kC].push(h.numero_ingreso + ": cama " + h.admision.cama + " inexistente");
+    else if (h.estado === "activa" && camasEstado[h.admision.cama] !== "ocupada") chk[kC].push(h.numero_ingreso + ": cama " + h.admision.cama + " no figura ocupada");
   });
   ["signos_vitales", "notas_enfermeria", "evoluciones"].forEach(c => db.getCollection(c).find().forEach(x => { if (!idsHos.has(hex(x.hospitalizacion_id))) chk[kH].push(c + " " + hex(x._id)); }));
   Object.keys(chk).forEach(k => print(k + ": " + (chk[k].length ? "\n  - " + chk[k].join("\n  - ") : "OK")));
   // Conteo de documentos por colección
   print("--- Conteo de documentos ---");
-  ["pacientes", "profesionales", "medicamentos", "diagnosticos_cie10", "hospitalizaciones", "signos_vitales", "notas_enfermeria", "evoluciones"].forEach(c => print(c + ": " + db.getCollection(c).countDocuments()));
+  ["pacientes", "profesionales", "medicamentos", "diagnosticos_cie10", "camas", "hospitalizaciones", "signos_vitales", "notas_enfermeria", "evoluciones"].forEach(c => print(c + ": " + db.getCollection(c).countDocuments()));
 })();
